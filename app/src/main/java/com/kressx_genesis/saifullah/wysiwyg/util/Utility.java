@@ -18,7 +18,8 @@ public class Utility {
         progressDialog = new ProgressDialog(activity);
         progressDialog.setCancelable(false);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.setMessage(null);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage(msg);
         progressDialog.show();
 
     }

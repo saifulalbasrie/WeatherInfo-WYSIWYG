@@ -1,6 +1,7 @@
 package com.kressx_genesis.saifullah.wysiwyg;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PixelFormat;
@@ -187,12 +188,18 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void showLoading() {
-        Utility.showBusyIndicator(this, "Please wait");
+        //Utility.showBusyIndicator(this, "Please wait");
+        View v = (View) findViewById(R.id.progressDialog);
+        if(v!=null)
+            v.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void stopLoading() {
-        Utility.closeBusyIndicator();
+        //Utility.closeBusyIndicator();
+        View v = (View) findViewById(R.id.progressDialog);
+        if(v!=null)
+            v.setVisibility(View.GONE);
     }
 
     @Override
@@ -278,7 +285,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        public void onAttach(Activity activity) {
+        public void onAttach(Context activity) {
             super.onAttach(activity);
             ((MainActivity) activity).onSectionAttached(
                     getArguments().getInt(ARG_SECTION_NUMBER));

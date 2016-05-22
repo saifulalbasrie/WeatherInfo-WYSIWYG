@@ -105,7 +105,7 @@ public class WeatherPresenterImpl implements IWeatherPresenter {
                         result.setTempMin(sTempMin);
                         result.setTempMax(sTempMax);
                         result.setHumidity(humidity + " %");
-                        result.setPressure(pressure + " hpa");
+                        result.setPressure(pressure + " hPa");
                         result.setLastUpdate("Last update: " + sLastUpdt);
                         result.setImgUrl(imgUrl);
 
