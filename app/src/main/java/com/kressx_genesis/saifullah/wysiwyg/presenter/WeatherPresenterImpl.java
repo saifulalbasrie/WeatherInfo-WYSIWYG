@@ -6,6 +6,7 @@ import com.kressx_genesis.saifullah.wysiwyg.model.WeatherResult;
 import com.kressx_genesis.saifullah.wysiwyg.model.gen.WeatherData;
 import com.kressx_genesis.saifullah.wysiwyg.services.WeatherServices;
 import com.kressx_genesis.saifullah.wysiwyg.util.UserPreference;
+import com.kressx_genesis.saifullah.wysiwyg.util.Utility;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -36,7 +37,6 @@ public class WeatherPresenterImpl implements IWeatherPresenter {
 
     @Override
     public void onCreate() {
-        getCurrentWeather(null);
         //TODO start worker
         //if(userPreference.isAutoRefresh())
         //    startWorker();
@@ -46,6 +46,47 @@ public class WeatherPresenterImpl implements IWeatherPresenter {
     public void onDestroy() {
         //TODO stop worker
         //stopWorker();
+    }
+
+    @Override
+    public void onSettingChanged() {
+        WeatherResult result = userPreference.getCurrentWeather(userPreference.getCurrentCity());
+        if(result!=null)
+        {
+            double temp = result.getTempKelvin();
+            double tempMin = result.getTempMinKelvin();
+            double tempMax = result.getTempMaxKelvin();
+            String sTemp;
+            String sTempMin;
+            String sTempMax;
+            DecimalFormat format = new DecimalFormat("#.0");
+            if (userPreference.getDegrees().equalsIgnoreCase("F")) {
+                temp = Utility.getFarenheitValue(temp);
+                tempMin = Utility.getFarenheitValue(tempMin);
+                tempMax = Utility.getFarenheitValue(tempMax);
+                sTemp = format.format(temp) + "\u2109";
+                sTempMin = format.format(tempMin) + "\u2109";
+                sTempMax = format.format(tempMax) + "\u2109";
+            } else {
+                temp = Utility.getCelciusValue(temp);
+                tempMin = Utility.getCelciusValue(tempMin);
+                tempMax = Utility.getCelciusValue(tempMax);
+                sTemp = format.format(temp) + "\u2103";
+                sTempMin = format.format(tempMin) + "\u2103";
+                sTempMax = format.format(tempMax) + "\u2103";
+            }
+
+            result.setTemp(sTemp);
+            result.setTempMin(sTempMin);
+            result.setTempMax(sTempMax);
+            onWeatherUpdatedSuccess(result);
+        }
+        else
+        {
+            getCurrentWeather(null);
+        }
+
+        //TODO start or stop or rest timer worker based on config
     }
 
     @Override
@@ -66,28 +107,31 @@ public class WeatherPresenterImpl implements IWeatherPresenter {
                         String city = response.body().getName();
                         String country = response.body().getSys().country;
                         String status = response.body().getWeather().get(0).description;
-                        double temp = response.body().getMain().temp;
-                        double tempMin = response.body().getMain().tempMin;
-                        double tempMax = response.body().getMain().tempMax;
+                        double tempKelvin = response.body().getMain().temp;
+                        double tempMinKelvin = response.body().getMain().tempMin;
+                        double tempMaxKelvin = response.body().getMain().tempMax;
 
                         String humidity = response.body().getMain().humidity.toString();
                         String pressure = response.body().getMain().pressure.toString();
 
+                        double temp = tempKelvin;
+                        double tempMin = tempMinKelvin;
+                        double tempMax = tempMaxKelvin;
                         String sTemp;
                         String sTempMin;
                         String sTempMax;
                         DecimalFormat format = new DecimalFormat("#.0");
                         if (userPreference.getDegrees().equalsIgnoreCase("F")) {
-                            temp = (temp * 9 / 5) - 459.67;
-                            tempMin = (tempMin * 9 / 5) - 459.67;
-                            tempMax = (tempMax * 9 / 5) - 459.67;
+                            temp = Utility.getFarenheitValue(tempKelvin); //temp * 9 / 5) - 459.67;
+                            tempMin = Utility.getFarenheitValue(tempMinKelvin);// tempMin * 9 / 5) - 459.67;
+                            tempMax = Utility.getFarenheitValue(tempMaxKelvin); // tempMax * 9 / 5) - 459.67;
                             sTemp = format.format(temp) + "\u2109";
                             sTempMin = format.format(tempMin) + "\u2109";
                             sTempMax = format.format(tempMax) + "\u2109";
                         } else {
-                            temp = temp - 273.15;
-                            tempMin = tempMin - 273.15;
-                            tempMax = tempMax - 273.15;
+                            temp = Utility.getCelciusValue(tempKelvin);// temp - 273.15;
+                            tempMin = Utility.getCelciusValue(tempMinKelvin); //tempMin - 273.15;
+                            tempMax = Utility.getCelciusValue(tempMaxKelvin); //tempMax - 273.15;
                             sTemp = format.format(temp) + "\u2103";
                             sTempMin = format.format(tempMin) + "\u2103";
                             sTempMax = format.format(tempMax) + "\u2103";
@@ -101,12 +145,15 @@ public class WeatherPresenterImpl implements IWeatherPresenter {
                         result.setCity(city);
                         result.setCountry(country);
                         result.setStatus(status);
+                        result.setTempKelvin(tempKelvin);
+                        result.setTempMinKelvin(tempMinKelvin);
+                        result.setTempMaxKelvin(tempMaxKelvin);
                         result.setTemp(sTemp);
                         result.setTempMin(sTempMin);
                         result.setTempMax(sTempMax);
                         result.setHumidity(humidity + " %");
                         result.setPressure(pressure + " hPa");
-                        result.setLastUpdate("Last update: " + sLastUpdt);
+                        result.setLastUpdate(sLastUpdt);
                         result.setImgUrl(imgUrl);
 
                         onWeatherUpdatedSuccess(result);
@@ -135,6 +182,7 @@ public class WeatherPresenterImpl implements IWeatherPresenter {
 
     private void onWeatherUpdatedSuccess(final WeatherResult data)
     {
+        userPreference.setCurrentWeather(data);
         android.os.Handler mainHandler = new android.os.Handler(context.getMainLooper());
         Runnable myRunnable = new Runnable() {
             @Override

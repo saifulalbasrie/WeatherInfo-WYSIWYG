@@ -8,6 +8,8 @@ public interface IWeatherPresenter {
 
     void onDestroy();
 
+    void onSettingChanged();
+
     void getCurrentWeather(String city);
 
 }

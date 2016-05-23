@@ -8,6 +8,9 @@ public class WeatherResult {
     private String city;
     private String country;
     private String status;
+    private double tempKelvin;
+    private double tempMinKelvin;
+    private double tempMaxKelvin;
     private String temp;
     private String tempMin;
     private String tempMax;
@@ -38,6 +41,30 @@ public class WeatherResult {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public double getTempKelvin() {
+        return tempKelvin;
+    }
+
+    public void setTempKelvin(double tempKelvin) {
+        this.tempKelvin = tempKelvin;
+    }
+
+    public double getTempMinKelvin() {
+        return tempMinKelvin;
+    }
+
+    public void setTempMinKelvin(double tempMinKelvin) {
+        this.tempMinKelvin = tempMinKelvin;
+    }
+
+    public double getTempMaxKelvin() {
+        return tempMaxKelvin;
+    }
+
+    public void setTempMaxKelvin(double tempMaxKelvin) {
+        this.tempMaxKelvin = tempMaxKelvin;
     }
 
     public String getTemp() {

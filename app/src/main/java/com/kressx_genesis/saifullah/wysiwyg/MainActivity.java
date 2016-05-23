@@ -1,6 +1,5 @@
 package com.kressx_genesis.saifullah.wysiwyg;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,11 +27,11 @@ import com.kressx_genesis.saifullah.wysiwyg.model.WeatherResult;
 import com.kressx_genesis.saifullah.wysiwyg.presenter.IWeatherPresenter;
 import com.kressx_genesis.saifullah.wysiwyg.presenter.IWeatherView;
 import com.kressx_genesis.saifullah.wysiwyg.presenter.WeatherPresenterImpl;
-import com.kressx_genesis.saifullah.wysiwyg.util.Utility;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks, IWeatherView {
 
+    public static final int CHANGE_SETTING = 10000;
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -112,19 +111,15 @@ public class MainActivity extends AppCompatActivity
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                .replace(R.id.container, PlaceholderFragment.newInstance(position))
                 .commit();
     }
 
     public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                mTitle = getString(R.string.menu_item_1);
-                break;
-            case 2:
-                mTitle = getString(R.string.menu_item_2);
-                break;
-        }
+        mTitle = getString(R.string.app_name);
+        String[] items = getResources().getStringArray(R.array.menu_array);
+        if(items!=null && number>=0 && number<items.length)
+            mTitle = items[number];
     }
 
     public void restoreActionBar() {
@@ -141,12 +136,20 @@ public class MainActivity extends AppCompatActivity
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.main, menu);
+            if(mNavigationDrawerFragment.getCurrentSelectedPosition()==0)
+                getMenuInflater().inflate(R.menu.main, menu);
             restoreActionBar();
             return true;
         }
         return super.onCreateOptionsMenu(menu);
     }
+
+//    public void setSelectedItemInNavigationDrawer(int pos)
+//    {
+//        mNavigationDrawerFragment.selectItem(pos);
+//        onSectionAttached(pos);
+//        restoreActionBar();
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -156,34 +159,33 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.action_reload) {
-            if(mNavigationDrawerFragment.getCurrentSelectedPosition()!=0)
-            {
-                mNavigationDrawerFragment.selectItem(0);
-                onSectionAttached(1);
-                restoreActionBar();
-            }
             presenter.getCurrentWeather(null);
             return true;
         }
         else if (id == R.id.action_searchCity) {
-            if(mNavigationDrawerFragment.getCurrentSelectedPosition()!=0)
-            {
-                mNavigationDrawerFragment.selectItem(0);
-                onSectionAttached(1);
-                restoreActionBar();
-            }
             showInputCityDialog();
             return true;
         }
         else if (id == R.id.action_settings) {
             if(mNavigationDrawerFragment!=null && mNavigationDrawerFragment.isDrawerOpen())
                 mNavigationDrawerFragment.closeDrawer();
+
             Intent intent = new Intent(MainActivity.this, SettingActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, CHANGE_SETTING);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CHANGE_SETTING) {
+            if (resultCode == RESULT_OK && mNavigationDrawerFragment.getCurrentSelectedPosition()==0) {
+                presenter.onSettingChanged();
+            }
+        }
     }
 
     @Override
@@ -221,7 +223,7 @@ public class MainActivity extends AppCompatActivity
         vStatus.setText(data.getStatus());
 
         TextView vLastUpdate = (TextView) findViewById(R.id.txt_last_update);
-        vLastUpdate.setText(data.getLastUpdate());
+        vLastUpdate.setText("Last update: " + data.getLastUpdate());
 
         TextView v1 = (TextView) findViewById(R.id.txt_humidity);
         v1.setText(data.getHumidity());
@@ -268,12 +270,11 @@ public class MainActivity extends AppCompatActivity
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView;
-            int id = 0;
-
+            int pos = 0;
             if(getArguments()!=null)
-                id = getArguments().getInt(ARG_SECTION_NUMBER);
+                pos = getArguments().getInt(ARG_SECTION_NUMBER);
 
-            if(id == 2)
+            if(pos==1)
             {
                 rootView = inflater.inflate(R.layout.fragment_about, container, false);
             }
@@ -287,8 +288,12 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onAttach(Context activity) {
             super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
+            int pos = getArguments().getInt(ARG_SECTION_NUMBER);
+            ((MainActivity) activity).onSectionAttached(pos);
+
+            if(pos==0)
+                ((MainActivity) activity).presenter.getCurrentWeather(null);
+
         }
     }
 

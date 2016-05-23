@@ -21,30 +21,50 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:text="@string/unit_label"
+            />
+
+        <Spinner
+            android:id="@+id/spinnerUnit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|right"
+            android:gravity="center_vertical|right"
+            android:spinnerMode="dropdown"
+            />
+        <!--
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
             android:text="Auto Refresh"
             />
         <ToggleButton
             android:id="@+id/toggleAuto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:gravity="center"
+            android:layout_gravity="center_vertical|right"
+            android:gravity="center_vertical|right"
             />
+        -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Refresh Interval (minutes)"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:text="@string/interval_label"
             />
-        <EditText
-            android:id="@+id/txtInterval"
+
+        <Spinner
+            android:id="@+id/spinnerInterval"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxLength="5"
-            android:layout_gravity="right"
-            android:gravity="center"
-            android:text="10"
+            android:layout_gravity="center_vertical|right"
+            android:gravity="center_vertical|right"
+            android:spinnerMode="dropdown"
             />
 
     </GridLayout>

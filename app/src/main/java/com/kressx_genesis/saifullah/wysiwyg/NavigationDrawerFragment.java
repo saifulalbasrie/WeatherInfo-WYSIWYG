@@ -1,6 +1,7 @@
 package com.kressx_genesis.saifullah.wysiwyg;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -104,10 +105,8 @@ public class NavigationDrawerFragment extends Fragment {
                 getActionBar().getThemedContext(),
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
-                new String[]{
-                        getString(R.string.menu_item_1),
-                        getString(R.string.menu_item_2),
-                }));
+                getResources().getStringArray(R.array.menu_array)
+                ));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
 
         return mDrawerView; //mDrawerListView;
@@ -149,6 +148,7 @@ public class NavigationDrawerFragment extends Fragment {
 //                R.string.navigation_drawer_open,  /* "open drawer" description for accessibility */
 //                R.string.navigation_drawer_close  /* "close drawer" description for accessibility */
 //        )
+        //support.v7
         mDrawerToggle = new ActionBarDrawerToggle(
                 getActivity(),                    /* host Activity */
                 mDrawerLayout,                    /* DrawerLayout object */
@@ -223,7 +223,7 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(Context activity) {
         super.onAttach(activity);
         try {
             mCallbacks = (NavigationDrawerCallbacks) activity;
@@ -268,7 +268,6 @@ public class NavigationDrawerFragment extends Fragment {
             return true;
         }
 
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -279,7 +278,7 @@ public class NavigationDrawerFragment extends Fragment {
     private void showGlobalContextActionBar() {
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        //actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setTitle(R.string.app_name);
     }
 

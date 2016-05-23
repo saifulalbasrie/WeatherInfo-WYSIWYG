@@ -30,4 +30,12 @@ public class Utility {
 
         progressDialog = null;
     }
+
+    public static double getFarenheitValue(double valueKelvin){
+        return (valueKelvin * 9 / 5) - 459.67;
+    }
+
+    public static double getCelciusValue(double valueKelvin){
+        return valueKelvin - 273.15;
+    }
 }
